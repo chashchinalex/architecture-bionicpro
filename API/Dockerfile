@@ -11,8 +11,11 @@ COPY Backend/appsettings.json .
 
 RUN dotnet publish Backend.csproj -c Release -r linux-x64 --no-self-contained -o /out
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS prod
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /out .
+
+# Expose port
+EXPOSE 3000
 
 CMD ["dotnet", "Backend.dll"]

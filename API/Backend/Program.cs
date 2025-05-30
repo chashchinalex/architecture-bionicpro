@@ -18,12 +18,12 @@ namespace Backend
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, opt => 
                 {
                     string keycloakURL = Environment.GetEnvironmentVariable("BACKEND_APP_KEYCLOAK_URL")
-                        ?? throw new Exception("Не задана переменная окружения BACKEND_APP_KEYCLOAK_URL");
+                        ?? throw new Exception("РќРµ Р·Р°РґР°РЅР° РїРµСЂРµРјРµРЅРЅР°СЏ РѕРєСЂСѓР¶РµРЅРёСЏ BACKEND_APP_KEYCLOAK_URL");
 
                     string keycloakRealm = Environment.GetEnvironmentVariable("BACKEND_APP_KEYCLOAK_REALM")
-                        ?? throw new Exception("Не задана пременная окружения BACKEND_APP_KEYCLOAK_REALM");
+                        ?? throw new Exception("РќРµ Р·Р°РґР°РЅР° РїСЂРµРјРµРЅРЅР°СЏ РѕРєСЂСѓР¶РµРЅРёСЏ BACKEND_APP_KEYCLOAK_REALM");
 
-					opt.Authority = $"{keycloakURL}/realms/{keycloakRealm}"; //TODO: сделать красиво
+					opt.Authority = $"{keycloakURL}/realms/{keycloakRealm}"; //TODO: СЃРґРµР»Р°С‚СЊ РєСЂР°СЃРёРІРѕ
                     opt.RequireHttpsMetadata = false;
                     opt.MetadataAddress = $"{keycloakURL}/realms/{keycloakRealm}/.well-known/openid-configuration";
                     opt.IncludeErrorDetails = true;
@@ -42,26 +42,26 @@ namespace Backend
 					};
                 });
 
-            // Конфигурируем политику авторизации
+            // РљРѕРЅС„РёРіСѓСЂРёСЂСѓРµРј РїРѕР»РёС‚РёРєСѓ Р°РІС‚РѕСЂРёР·Р°С†РёРё
 			builder.Services
 				.AddAuthorizationBuilder()
 				.AddPolicy("ProtheticUser", (pb) =>
 				{
-					pb.RequireRealmRoles("prothetic_user"); // требуемая роль
+					pb.RequireRealmRoles("prothetic_user"); // С‚СЂРµР±СѓРµРјР°СЏ СЂРѕР»СЊ
 				});
-            // Подключаем "преобразователь" кода ответа
+            // РџРѕРґРєР»СЋС‡Р°РµРј "РїСЂРµРѕР±СЂР°Р·РѕРІР°С‚РµР»СЊ" РєРѕРґР° РѕС‚РІРµС‚Р°
             builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, AuthorizationResultTransformer>();
 
 			builder.Services.AddKeycloakAuthorization( (opt) => 
             {
                 opt.Realm = Environment.GetEnvironmentVariable("BACKEND_APP_KEYCLOAK_REALM")
-                    ?? throw new Exception("Не задана пременная окружения BACKEND_APP_KEYCLOAK_REALM");
+                    ?? throw new Exception("РќРµ Р·Р°РґР°РЅР° РїСЂРµРјРµРЅРЅР°СЏ РѕРєСЂСѓР¶РµРЅРёСЏ BACKEND_APP_KEYCLOAK_REALM");
                 opt.AuthServerUrl = Environment.GetEnvironmentVariable("BACKEND_APP_KEYCLOAK_URL")
-                    ?? throw new Exception("Не задана переменная окружения BACKEND_APP_KEYCLOAK_URL");
+                    ?? throw new Exception("РќРµ Р·Р°РґР°РЅР° РїРµСЂРµРјРµРЅРЅР°СЏ РѕРєСЂСѓР¶РµРЅРёСЏ BACKEND_APP_KEYCLOAK_URL");
                 opt.VerifyTokenAudience = false;
                 opt.SslRequired = "none";
                 opt.Resource = Environment.GetEnvironmentVariable("BACKEND_APP_KEYCLOAK_CLIENT_ID")
-                    ?? throw new Exception("Не задана пременная окружения BACKEND_APP_KEYCLOAK_CLIENT_ID");
+                    ?? throw new Exception("РќРµ Р·Р°РґР°РЅР° РїСЂРµРјРµРЅРЅР°СЏ РѕРєСЂСѓР¶РµРЅРёСЏ BACKEND_APP_KEYCLOAK_CLIENT_ID");
 			});
 
             builder.Services.AddCors(options =>
