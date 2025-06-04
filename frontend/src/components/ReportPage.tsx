@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
 
+interface Report {
+  id: number;
+  title: string;
+  created_at: string;
+  summary: string;
+}
+
 const ReportPage: React.FC = () => {
   const { keycloak, initialized } = useKeycloak();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [reports, setReports] = useState<Report[]>([]);
 
   const downloadReport = async () => {
     if (!keycloak?.token) {
@@ -22,9 +30,16 @@ const ReportPage: React.FC = () => {
         }
       });
 
-      
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setReports(data.reports);
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
+      setReports([]);
     } finally {
       setLoading(false);
     }
