@@ -1,6 +1,6 @@
-import React from 'react';
 import { ReactKeycloakProvider } from '@react-keycloak/web';
 import Keycloak, { KeycloakConfig } from 'keycloak-js';
+import React from 'react';
 import ReportPage from './components/ReportPage';
 
 const keycloakConfig: KeycloakConfig = {
@@ -13,7 +13,11 @@ const keycloak = new Keycloak(keycloakConfig);
 
 const App: React.FC = () => {
   return (
-    <ReactKeycloakProvider authClient={keycloak}>
+    <ReactKeycloakProvider authClient={keycloak} initOptions={{
+      onLoad: 'login-required',
+      pkceMethod: 'S256',
+      checkLoginIframe: false
+    }}>
       <div className="App">
         <ReportPage />
       </div>
