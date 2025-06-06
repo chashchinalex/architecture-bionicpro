@@ -1,6 +1,10 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using reportsapi;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddProblemDetails();
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -10,20 +14,23 @@ builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = "http://localhost:8080/realms/reports-realm";
-        options.Audience  = "reports-api";            // должен совпадать с aud
-        options.RequireHttpsMetadata = false;         // только для локальной разработки
+        options.Authority = "http://keycloak:8080/realms/reports-realm";
+        
+        options.Audience  = "reports-api";            
+        options.RequireHttpsMetadata = false;         
+        options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
 
         options.TokenValidationParameters = new()
         {
-            ValidateIssuer = true,
+            ValidateIssuer = true, 
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true
         };
-    });                                               // :contentReference[oaicite:1]{index=1}
+    });                                               
 
 builder.Services.AddAuthorization();
+builder.Services.AddSingleton<IClaimsTransformation, RealmRoleClaimsTransformation>();
 
 
 var app = builder.Build();
@@ -55,7 +62,7 @@ app.MapGet("/reports", () =>
             .ToArray();
         return forecast;
     })
-    .RequireAuthorization()
+    .RequireAuthorization(p=>p.RequireRole("prothetic_user"))
     .WithName("GetWeatherForecast");
 
 app.Run();
