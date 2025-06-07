@@ -33,14 +33,15 @@ services:
 
   backend:
     build:
-      context: ./backend_api
+      context: ./API
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
     environment:
-      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_SERVER_URL : http://127.0.0.1:8080
       REALM: reports-realm
-      CLIENT_ID: reports-frontend
+      CLIENT_SECRET: "oNwoLQdvJAvRcL89SydqCWCe5ry1jMgq"
+      CLIENT_ID: "reports-api"
     depends_on:
       - keycloak
 

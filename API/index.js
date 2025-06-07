@@ -5,12 +5,12 @@ const cors = require('cors')
 
 const memoryStore = new session.MemoryStore();
 const keycloak = new Keycloak({ store: memoryStore }, {
-  "auth-server-url": 'http://127.0.0.1:8080',
-  realm: 'reports-realm',
-  "clientId": "reports-api",
+  "auth-server-url": process.env.KEYCLOAK_SERVER_URL || 'http://127.0.0.1:8080',
+  realm: process.env.REALM || 'reports-realm',
+  "clientId": process.env.CLIENT_ID || "reports-api",
   "enabled": true,
   "clientAuthenticatorType": "client-secret",
-  "secret": "oNwoLQdvJAvRcL89SydqCWCe5ry1jMgq",
+  "secret": process.env.CLIENT_SECRET,
   "bearerOnly": true
 });
 
