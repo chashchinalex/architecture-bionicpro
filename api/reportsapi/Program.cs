@@ -10,6 +10,15 @@ builder.Services.AddProblemDetails();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendDev", p => p
+        .WithOrigins("http://localhost:3000") 
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials());
+});
+
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -34,6 +43,7 @@ builder.Services.AddSingleton<IClaimsTransformation, RealmRoleClaimsTransformati
 
 
 var app = builder.Build();
+app.UseCors("FrontendDev"); 
 app.UseAuthentication();
 app.UseAuthorization();
 
