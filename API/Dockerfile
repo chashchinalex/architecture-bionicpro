@@ -8,8 +8,6 @@ RUN npm install --production
 
 # Copy app source code
 COPY . .
-RUN npm run build
-
 
 # Start the app
-ENTRYPOINT [ "npm", "run", "start:prod"]
+ENTRYPOINT [ "npm", "run", "start"]
