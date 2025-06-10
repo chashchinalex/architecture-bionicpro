@@ -1,32 +1,24 @@
 const express = require('express')
 const Keycloak = require('keycloak-connect');
-const session = require('express-session');
 const cors = require('cors')
+const Jwt = require("jsonwebtoken");
 
-const memoryStore = new session.MemoryStore();
-const keycloak = new Keycloak({ store: memoryStore }, {
-  "auth-server-url": process.env.KEYCLOAK_SERVER_URL || 'http://127.0.0.1:8080',
-  realm: process.env.REALM || 'reports-realm',
-  "clientId": process.env.CLIENT_ID || "reports-api",
-  "enabled": true,
-  "clientAuthenticatorType": "client-secret",
-  "secret": process.env.CLIENT_SECRET,
-  "bearerOnly": true
-});
+const keycloakConfig = {
+  clientId: process.env.CLIENT_ID,
+  bearerOnly: true,
+  serverUrl: process.env.KEYCLOAK_SERVER_URL,
+  realm: process.env.REALM,
+  credentials: {
+    secret: process.env.CLIENT_SECRET,
+  },
+};
+
+const keycloak = new Keycloak({}, keycloakConfig);
 
 const app = express()
-const port = 3000
+const port = 8000
 
 app.use(cors())
-
-app.use(session({
-  secret:'TestSecret',
-  resave: false,
-  saveUninitialized: true,
-  store: memoryStore
-}));
-
-app.use( keycloak.middleware( { logout: '/'} ));
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
@@ -35,11 +27,24 @@ app.get('/', (req, res) => {
 //route protected with Keycloak
 app.get(
   '/reports',
-  keycloak.protect(
-  (token, request) =>  {
-    return token.hasRole( "realm:prothetic_user")
-  }),
-  function(req, res){
+  async function(req, res) {
+    const token = req.headers?.authorization?.split(" ")[1];
+    const check = await keycloak.grantManager
+      .validateAccessToken(token);
+
+    if (!check) {
+      return res.status(401).send();
+    }
+
+    await keycloak.grantManager
+      .validateAccessToken(token)
+
+    const decoded = Jwt.decode(token);
+
+    if (!decoded.realm_access.roles.includes('prothetic_user')) {
+      return res.status(401).send();
+    }
+
     res.json({
       data: {
         reports: [
