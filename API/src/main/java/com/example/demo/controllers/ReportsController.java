@@ -23,7 +23,6 @@ public class ReportsController {
         HttpHeaders respHeaders = new HttpHeaders();
         respHeaders.setContentType(MediaType.APPLICATION_JSON);
         respHeaders.setContentLength(fileLength);
-//        respHeaders.setContentDispositionFormData("attachment; filename=", "report.txt");
         respHeaders.set(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=report.txt");
 
