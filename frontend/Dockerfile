@@ -1,10 +1,16 @@
 # Build stage
-FROM node:16-alpine as build
+FROM node:16-alpine AS build
 
 WORKDIR /app
 
 # Copy package files
 COPY package.json package-lock.json ./
+
+# Set strict-ssl false
+
+RUN npm config set ca=""
+
+RUN npm set strict-ssl false
 
 # Install dependencies
 RUN npm ci

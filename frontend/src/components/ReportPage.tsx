@@ -5,6 +5,7 @@ const ReportPage: React.FC = () => {
   const { keycloak, initialized } = useKeycloak();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<string | null>(null);
 
   const downloadReport = async () => {
     if (!keycloak?.token) {
@@ -22,7 +23,14 @@ const ReportPage: React.FC = () => {
         }
       });
 
-      
+      if(response.ok){
+        const text = await response.text(); 
+        setData(text)
+      }
+
+      if (response.status !== 200) {
+        throw new Error(response.statusText);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -51,7 +59,7 @@ const ReportPage: React.FC = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <div className="p-8 bg-white rounded-lg shadow-md">
         <h1 className="text-2xl font-bold mb-6">Usage Reports</h1>
-        
+
         <button
           onClick={downloadReport}
           disabled={loading}
@@ -67,6 +75,12 @@ const ReportPage: React.FC = () => {
             {error}
           </div>
         )}
+
+        {data && <pre>
+          Отчеты:
+          {data}
+          </pre>}
+
       </div>
     </div>
   );
