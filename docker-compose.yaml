@@ -29,6 +29,16 @@ services:
       - "8080:8080"
     depends_on:
       - keycloak_db
+    api:
+      build:
+        context: ./API
+      environment:
+        - KEYCLOAK_URL=http://keycloak:8080
+        - KEYCLOAK_REALM=reports-realm
+      ports:
+        - "8000:8000"
+      depends_on:
+        - keycloak
   frontend:
     build:
       context: ./frontend
