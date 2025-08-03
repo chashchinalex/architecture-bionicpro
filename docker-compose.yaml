@@ -43,7 +43,7 @@ services:
 
   reportapi:
     build:
-      context: ./backend/ReportAPI
+      context: ./API/ReportAPI
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
