@@ -18,11 +18,29 @@ const ReportPage: React.FC = () => {
 
       const response = await fetch(`${process.env.REACT_APP_API_URL}/reports`, {
         headers: {
-          'Authorization': `Bearer ${keycloak.token}`
-        }
+          'Authorization': `Bearer ${keycloak.token}`,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
       });
 
-      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
+      const data = await response.json();
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `report-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
