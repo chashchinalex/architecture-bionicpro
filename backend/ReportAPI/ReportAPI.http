@@ -1,6 +1,7 @@
-@ReportAPI_HostAddress = http://localhost:5038
+### Get reports (requires prothetic_user role)
+GET {{baseUrl}}/reports
+Authorization: Bearer {{jwt_token}}
 
-GET {{ReportAPI_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
+### Variables
+@baseUrl = http://localhost:5000
+@jwt_token = YOUR_JWT_TOKEN_HERE
