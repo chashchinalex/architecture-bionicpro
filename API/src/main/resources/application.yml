@@ -1,0 +1,20 @@
+server:
+  port: 8081
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/reports-realm
+          jwk-set-uri: http://keycloak:8080/realms/reports-realm/protocol/openid-connect/certs
+  web:
+    cors:
+      allowed-origins: "http://localhost:3000"
+      allowed-methods: "GET,POST,OPTIONS"
+      allowed-headers: "*"
+
+logging:
+  level:
+    org.springframework.security: INFO
+    org.springframework.security.oauth2: INFO
