@@ -34,9 +34,10 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - keycloak_db
+      keycloak_db:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8000/health || exit 1"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -72,8 +73,8 @@ services:
       - "9431:9000"
     volumes:
       - ./clickhouse-data:/var/lib/clickhouse
-      - ./olap-db:/docker-entrypoint-initdb.d
       - ./olap-db:/var/lib/clickhouse/user_files
+      - ./olap-db:/docker-entrypoint-initdb.d
       - ./olap-db/users.xml:/etc/clickhouse-server/users.d/users.xml
     healthcheck:
       test: ["CMD-SHELL", "clickhouse-client --query 'SELECT 1'"]
@@ -96,3 +97,41 @@ services:
     depends_on:
       - olap_db
       - keycloak
+  airflow_db:
+    image: postgres:14-bullseye
+    environment:
+      POSTGRES_DB: airflow
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+    volumes:
+      - ./postgres-airflow-data:/var/lib/postgresql/data
+    ports:
+      - "5445:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow -d airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+  airflow:
+    image: apache/airflow:2.8.1
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow_db:5432/airflow
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: 'true'
+      AIRFLOW__WEBSERVER__WEB_SERVER_PORT: '8080'
+      AIRFLOW__WEBSERVER__BASE_URL: 'http://localhost:8081'
+      AIRFLOW__CORE__FERNET_KEY: '4wOzwyg/Kp891S8Ao5pxCwQZaADcM2jTWGn6Zvu7Ijg='
+      _PIP_ADDITIONAL_REQUIREMENTS: 'clickhouse-driver psycopg2-binary'
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+    ports:
+      - "8081:8080"
+    depends_on:
+      airflow_db:
+        condition: service_healthy
+    command: ["bash", "/opt/airflow/dags/init-airflow.sh"]

@@ -13,20 +13,20 @@ import (
 
 func (app *App) GetReports(c *gin.Context) {
 	// Get user ID from context (set by auth middleware)
-	userID, exists := c.Get("user_id")
+	email, exists := c.Get("email")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in token"})
 		return
 	}
 
-	userIDStr, ok := userID.(string)
+	emailStr, ok := email.(string)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID format"})
 		return
 	}
 
 	// Query ClickHouse
-	reports, err := app.ClickHouse.GetUserReports(c.Request.Context(), userIDStr)
+	reports, err := app.ClickHouse.GetUserReports(c.Request.Context(), emailStr)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to fetch reports: %v", err)})
 		return
@@ -40,7 +40,7 @@ func (app *App) GetReports(c *gin.Context) {
 	}
 
 	// Set headers for file download
-	filename := fmt.Sprintf("user_reports_%s_%s.csv", userIDStr, time.Now().Format("2006-01-02"))
+	filename := fmt.Sprintf("user_reports_%s_%s.csv", emailStr, time.Now().Format("2006-01-02"))
 	c.Header("Content-Type", "text/csv")
 	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
 	c.Header("Content-Length", strconv.Itoa(len(csvData)))
@@ -66,7 +66,7 @@ func generateCSV(reports []ReportRecord) ([]byte, error) {
 		row := []string{
 			record.ProsthesisType,
 			record.MuscleGroup,
-			strconv.FormatInt(record.Signals, 10),
+			strconv.FormatUint(record.Signals, 10),
 			strconv.FormatFloat(record.AvgAmplitude, 'f', 2, 64),
 			strconv.FormatFloat(record.P95Amplitude, 'f', 2, 64),
 			strconv.FormatFloat(record.AvgFrequency, 'f', 2, 64),

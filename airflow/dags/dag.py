@@ -1,10 +1,10 @@
-
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.hooks.base import BaseHook
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 import logging
+import psycopg2
 
 # pip install clickhouse-driver psycopg2-binary
 try:
@@ -12,9 +12,6 @@ try:
 except Exception as e:
     CHClient = None
     logging.warning("clickhouse-driver not available: %s", e)
-
-CRM_CONN_ID = "crm_postgres"
-CH_CONN_ID = "olap_clickhouse"
 
 default_args = {
     "owner": "data-eng",
@@ -45,13 +42,24 @@ with DAG(
             database='reports'
         )
 
+    def _get_pg_connection():
+        """Get PostgreSQL connection for CRM database"""
+        return psycopg2.connect(
+            host='crm_db',
+            port=5432,
+            database='crm_db',
+            user='crm_user',
+            password='crm_password'
+        )
+
     def extract_crm_to_clickhouse(**context):
         """Extract data from CRM PostgreSQL and load into ClickHouse"""
         if CHClient is None:
             raise RuntimeError("clickhouse-driver is not installed")
         
-        # Connect to CRM PostgreSQL
-        pg = PostgresHook(postgres_conn_id=CRM_CONN_ID)
+        # Connect to CRM PostgreSQL using direct connection
+        pg_conn = _get_pg_connection()
+        pg_cursor = pg_conn.cursor()
         
         # Get CRM data
         query = """
@@ -64,7 +72,11 @@ with DAG(
         FROM customers
         """
         
-        rows = pg.get_records(query)
+        pg_cursor.execute(query)
+        rows = pg_cursor.fetchall()
+        pg_cursor.close()
+        pg_conn.close()
+        
         logging.info("Fetched %d CRM rows", len(rows))
 
         # Connect to ClickHouse

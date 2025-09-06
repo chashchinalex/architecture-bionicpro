@@ -17,7 +17,7 @@ type ClickHouseClient struct {
 type ReportRecord struct {
 	ProsthesisType string    `json:"prosthesis_type"`
 	MuscleGroup    string    `json:"muscle_group"`
-	Signals        int64     `json:"signals"`
+	Signals        uint64    `json:"signals"` // Changed from int64 to uint64
 	AvgAmplitude   float64   `json:"avg_amplitude"`
 	P95Amplitude   float64   `json:"p95_amplitude"`
 	AvgFrequency   float64   `json:"avg_frequency"`
