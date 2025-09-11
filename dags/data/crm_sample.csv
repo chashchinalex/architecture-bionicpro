@@ -1,0 +1,11 @@
+user_id;customer_name;customer_email;prosthesis_model;prosthesis_serial;installation_date
+1;prothetic1;prothetic1@example.com;AlphaLimb Pro;SN-ALP2023-001;2023-05-15
+2;prothetic2;prothetic2@example.com;BioHand Plus;SN-BHP2023-045;2023-06-20
+3;prothetic3;prothetic3@example.com;SmartGrip Ultra;SN-SGU2023-178;2023-07-10
+1;prothetic1;prothetic1@example.com;AlphaLimb Pro v2;SN-ALP2024-002;2024-01-12
+2;prothetic2;prothetic2@example.com;BioHand Elite;SN-BHE2024-087;2024-02-18
+3;prothetic3;prothetic3@example.com;SmartGrip Pro;SN-SGP2024-192;2024-03-22
+1;prothetic1;prothetic1@example.com;AlphaLimb Pro;SN-ALP2023-003;2023-08-15
+2;prothetic2;prothetic2@example.com;BioHand Plus;SN-BHP2023-051;2023-09-30
+3;prothetic3;prothetic3@example.com;SmartGrip Ultra;SN-SGU2023-181;2023-10-14
+1;prothetic1;prothetic1@example.com;AlphaLimb Pro v2;SN-ALP2024-004;2024-04-01
