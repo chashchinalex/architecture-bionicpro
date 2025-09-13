@@ -20,7 +20,7 @@ def generate_crm():
             if is_header:
                 is_header = False
                 continue
-            insert_query = f"INSERT INTO crm_table (id,user_id,user_name,email,prosthesis_model,prosthesis_serial,installation_date) VALUES ({row[0]}, {row[1]}, '{row[2]}','{row[3]}','{row[4]}','{row[5]}','{row[6]}');"
+            insert_query = f"INSERT INTO crm_table (id,user_id,user_name,email,prosthesis_model,prosthesis_serial,installation_date) VALUES ({row[0]}, '{row[1]}', '{row[2]}','{row[3]}','{row[4]}','{row[5]}','{row[6]}');"
             insert_queries.append(insert_query)
         
         with open('./dags/sql/insert_crm.sql', 'w') as f:
@@ -38,17 +38,18 @@ def generate_telemetry():
             if is_header:
                 is_header = False
                 continue
-            insert_query = f"INSERT INTO telemetry_table (id,user_id,usage_date,session_count,total_usage_minutes,max_force_application,avg_battery_level,error_codes,last_active) VALUES ({row[0]}, {row[1]}, '{row[2]}',{row[3]},{row[4]},{row[5]},{row[6]},'{row[7]}','{row[8]}');"
+            insert_query = f"INSERT INTO telemetry_table (id,user_id,usage_date,session_count,total_usage_minutes,max_force_application,avg_battery_level,error_codes,last_active) VALUES ({row[0]}, '{row[1]}', '{row[2]}',{row[3]},{row[4]},{row[5]},{row[6]},'{row[7]}','{row[8]}');"
             insert_queries.append(insert_query)
         
         with open('./dags/sql/insert_telemetry.sql', 'w') as f:
             for query in insert_queries:
                 f.write(f"{query}\n")
 
-with DAG('csv_to_postgres_dag',
-         default_args=default_args, #аргументы по умолчанию в начале скрипта
-         schedule_interval='@once', #запускаем один раз
-         catchup=False) as dag: #предотвращает повторное выполнение DAG для пропущенных расписаний.
+with DAG('init_data',
+         default_args=default_args,
+         schedule_interval='@once',
+         tags=['init', 'etl'],
+         catchup=False) as dag:
 
     create_crm_table = PostgresOperator(
         task_id='create_crm_table',
@@ -57,7 +58,7 @@ with DAG('csv_to_postgres_dag',
         DROP TABLE IF EXISTS crm_table;
         CREATE TABLE crm_table (
             id SERIAL PRIMARY KEY,
-            user_id INTEGER NOT NULL,
+            user_id UUID NOT NULL,
             user_name VARCHAR(100) NOT NULL,
             email VARCHAR(150) NOT NULL,
             prosthesis_model VARCHAR(100) NOT NULL,
@@ -76,7 +77,7 @@ with DAG('csv_to_postgres_dag',
         DROP TABLE IF EXISTS telemetry_table;
         CREATE TABLE telemetry_table (
             id SERIAL PRIMARY KEY,
-            user_id INTEGER NOT NULL,
+            user_id UUID NOT NULL,
             usage_date DATE NOT NULL,
             session_count INTEGER NOT NULL DEFAULT 0,
             total_usage_minutes INTEGER NOT NULL DEFAULT 0,

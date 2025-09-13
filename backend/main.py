@@ -8,6 +8,9 @@ import uuid
 import hashlib
 from typing import Dict
 from random import randint
+import logging
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 app = FastAPI()
 
@@ -59,6 +62,8 @@ def get_current_user(token: HTTPAuthorizationCredentials = Depends(bearer_scheme
             issuer=KEYCLOAK_ISSUER
         )
 
+        logging.warning(payload)
+
         roles = payload.get("realm_access", {}).get("roles", [])
         if "prothetic_user" not in roles:
             raise HTTPException(status_code=403, detail="Insufficient role")
@@ -72,19 +77,29 @@ def get_current_user(token: HTTPAuthorizationCredentials = Depends(bearer_scheme
 @app.get("/reports")
 def get_reports(user: Dict = Depends(get_current_user)):
     user_id = user.get("sub", "unknown")
+    logging.warning(user_id)
 
-    hash_digest = hashlib.sha256(user_id.encode()).hexdigest()
-    device_count = 1 + int(hash_digest[0], 16) % 10
-
-    reports = []
-    for i in range(device_count):
-        seed = f"{user_id}-{i}"
-        device_uuid = str(uuid.UUID(hashlib.sha256(seed.encode()).hexdigest()[:32]))
-        report = {
-            "device": device_uuid,
-            "reportId": str(uuid.uuid4()),
-            "value": randint(1, 95)
+    db_config = {
+            'host': os.environ.get("AIRFLOW_DB_HOST", "postgres"),
+            'database': os.environ.get("AIRFLOW_DB_NAME", "sample"),
+            'user': os.environ.get("AIRFLOW_DB_USER", "airflow"),
+            'password': os.environ.get("AIRFLOW_DB_PASSWORD", "airflow"),
+            'port': '5432'
         }
-        reports.append(report)
+    
+    connection = psycopg2.connect(**db_config)
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
+
+    query = """
+        SELECT * FROM olap_table
+        WHERE user_id = %s
+        """
+    params = [user_id]
+
+    cursor.execute(query, params)
+    reports = [dict(row) for row in cursor.fetchall()]
+
+    cursor.close()
+    connection.close()
 
     return {"reports": reports}

@@ -25,6 +25,8 @@ const ReportPage: React.FC = () => {
         }
       });
 
+      console.log(await keycloak.loadUserInfo())
+
       if (!response.ok) {
         let message = `Error ${response.status}`;
         try {
@@ -90,17 +92,39 @@ const ReportPage: React.FC = () => {
           <table className="mt-6 table-auto border border-gray-300">
             <thead className="bg-gray-200">
               <tr>
-                <th className="border px-4 py-2">reportId</th>
-                <th className="border px-4 py-2">device</th>
-                <th className="border px-4 py-2">value</th>
+                <th className="border px-4 py-2">user_name</th>
+                <th className="border px-4 py-2">email</th>
+                <th className="border px-4 py-2">prosthesis_model</th>
+                <th className="border px-4 py-2">prosthesis_serial</th>
+                <th className="border px-4 py-2">installation_date</th>
+                <th className="border px-4 py-2">total_usage_minutes</th>
+                <th className="border px-4 py-2">usage_date</th>
+                <th className="border px-4 py-2">avg_battery_level</th>
+                <th className="border px-4 py-2">avg_max_force</th>
+                <th className="border px-4 py-2">last_active</th>
+                <th className="border px-4 py-2">total_error_count</th>
+                <th className="border px-4 py-2">total_sessions</th>
+                <th className="border px-4 py-2">updated_at</th>
+                <th className="border px-4 py-2">created_at</th>
               </tr>
             </thead>
             <tbody>
               {reports.map((r, i) => (
                 <tr key={i}>
-                  <td className="border px-4 py-2">{r.reportId}</td>
-                  <td className="border px-4 py-2">{r.device}</td>
-                  <td className="border px-4 py-2">{r.value}</td>
+                  <td className="border px-4 py-2">{r.user_name}</td>
+                  <td className="border px-4 py-2">{r.email}</td>
+                  <td className="border px-4 py-2">{r.prosthesis_model}</td>
+                  <td className="border px-4 py-2">{r.prosthesis_serial}</td>
+                  <td className="border px-4 py-2">{r.installation_date}</td>
+                  <td className="border px-4 py-2">{r.total_usage_minutes}</td>
+                  <td className="border px-4 py-2">{r.usage_date}</td>
+                  <td className="border px-4 py-2">{r.avg_battery_level}</td>
+                  <td className="border px-4 py-2">{r.avg_max_force}</td>
+                  <td className="border px-4 py-2">{r.last_active}</td>
+                  <td className="border px-4 py-2">{r.total_error_count}</td>
+                  <td className="border px-4 py-2">{r.total_sessions}</td>
+                  <td className="border px-4 py-2">{r.updated_at}</td>
+                  <td className="border px-4 py-2">{r.created_at}</td>
                 </tr>
               ))}
             </tbody>

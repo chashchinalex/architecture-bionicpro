@@ -26,6 +26,4 @@ const App: React.FC = () => {
   );
 };
 
-console.log(keycloak)
-
 export default App;
