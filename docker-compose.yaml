@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   keycloak_db:
@@ -11,6 +11,41 @@ services:
       - ./postgres-keycloak-data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
+
+  # База данных для отчётов (OLAP)
+  reports_db:
+    image: postgres:16.0
+    environment:
+      POSTGRES_USER: reports_user
+      POSTGRES_PASSWORD: reports_password
+      POSTGRES_DB: reports_db
+    volumes:
+      - ./airflow/db/init-reports-db.sql:/docker-entrypoint-initdb.d/init-reports-db.sql
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U reports_user -d reports_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Airflow база данных
+  airflow_db:
+    image: postgres:16.0
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - ./airflow/db/init-airflow-db.sql:/docker-entrypoint-initdb.d/init-airflow-db.sql
+    ports:
+      - "5435:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow -d airflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   keycloak:
     image: quay.io/keycloak/keycloak:21.1
     environment:
@@ -20,7 +55,7 @@ services:
       KC_DB_URL: jdbc:postgresql://keycloak_db:5432/keycloak_db
       KC_DB_USERNAME: keycloak_user
       KC_DB_PASSWORD: keycloak_password
-    command: 
+    command:
       - start-dev
       - --import-realm
     volumes:
@@ -29,6 +64,108 @@ services:
       - "8080:8080"
     depends_on:
       - keycloak_db
+
+  # Airflow компоненты
+  airflow-init:
+    build:
+      context: ./airflow
+      dockerfile: Dockerfile
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow_db:5432/airflow
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow_db:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: ""
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
+      AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
+      AIRFLOW__WEBSERVER__SECRET_KEY: "your_airflow_webserver_sec_key"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/dags/sql:/opt/airflow/dags/sql
+      - ./airflow/requirements.txt:/opt/airflow/requirements.txt
+      - ./airflow/data:/opt/airflow/data
+    user: "${AIRFLOW_UID:-50000}:0"
+    depends_on:
+      airflow_db:
+        condition: service_healthy
+    command: >
+      bash -c "
+      airflow db init &&
+      airflow users create \
+      --username admin \
+      --firstname admin \
+      --lastname admin \
+      --role Admin \
+      --email admin@sample.ru \
+      --password admin
+      "
+
+  airflow-webserver:
+    build:
+      context: ./airflow
+      dockerfile: Dockerfile
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow_db:5432/airflow
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow_db:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: ""
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
+      AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
+      AIRFLOW__WEBSERVER__SECRET_KEY: "your_airflow_webserver_sec_key"
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/dags/sql:/opt/airflow/dags/sql
+      - ./airflow/requirements.txt:/opt/airflow/requirements.txt
+      - ./airflow/data:/opt/airflow/data
+    user: "${AIRFLOW_UID:-50000}:0"
+    depends_on:
+      airflow_db:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+    command: webserver
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  airflow-scheduler:
+    build:
+      context: ./airflow
+      dockerfile: Dockerfile
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow_db:5432/airflow
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow_db:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: ""
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
+      AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
+      AIRFLOW__WEBSERVER__SECRET_KEY: "your_airflow_webserver_sec_key"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/dags/sql:/opt/airflow/dags/sql
+      - ./airflow/requirements.txt:/opt/airflow/requirements.txt
+      - ./airflow/data:/opt/airflow/data
+    user: "${AIRFLOW_UID:-50000}:0"
+    depends_on:
+      airflow_db:
+        condition: service_healthy
+      airflow-webserver:
+        condition: service_healthy
+    command: scheduler
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
   frontend:
     build:
       context: ./frontend

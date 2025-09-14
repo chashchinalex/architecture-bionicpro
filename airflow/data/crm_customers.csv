@@ -1,0 +1,6 @@
+customer_id,name,email,phone,registration_date,prosthesis_type,status
+1,Иван Петров,ivan.petrov@email.com,+7-900-123-45-67,2024-01-15,upper_limb,active
+2,Мария Сидорова,maria.sidorova@email.com,+7-900-234-56-78,2024-02-20,lower_limb,active
+3,Алексей Козлов,alexey.kozlov@email.com,+7-900-345-67-89,2024-03-10,upper_limb,active
+4,Елена Волкова,elena.volkova@email.com,+7-900-456-78-90,2024-04-05,lower_limb,active
+5,Дмитрий Новиков,dmitry.novikov@email.com,+7-900-567-89-01,2024-05-12,upper_limb,active

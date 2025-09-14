@@ -1,0 +1,16 @@
+telemetry_id,customer_id,timestamp,device_id,sensor_type,value,unit,activity_type
+1,1,2024-12-01 08:00:00,DEV001,muscle_signal,0.85,volts,grasp
+2,1,2024-12-01 08:05:00,DEV001,muscle_signal,0.92,volts,release
+3,1,2024-12-01 08:10:00,DEV001,position,45.2,degrees,flex
+4,2,2024-12-01 09:00:00,DEV002,muscle_signal,0.78,volts,walk
+5,2,2024-12-01 09:05:00,DEV002,muscle_signal,0.88,volts,stand
+6,2,2024-12-01 09:10:00,DEV002,pressure,12.5,kPa,step
+7,3,2024-12-01 10:00:00,DEV003,muscle_signal,0.95,volts,grasp
+8,3,2024-12-01 10:05:00,DEV003,muscle_signal,0.89,volts,release
+9,3,2024-12-01 10:10:00,DEV003,position,38.7,degrees,extend
+10,4,2024-12-01 11:00:00,DEV004,muscle_signal,0.82,volts,walk
+11,4,2024-12-01 11:05:00,DEV004,muscle_signal,0.91,volts,stand
+12,4,2024-12-01 11:10:00,DEV004,pressure,11.8,kPa,step
+13,5,2024-12-01 12:00:00,DEV005,muscle_signal,0.87,volts,grasp
+14,5,2024-12-01 12:05:00,DEV005,muscle_signal,0.93,volts,release
+15,5,2024-12-01 12:10:00,DEV005,position,42.1,degrees,flex
