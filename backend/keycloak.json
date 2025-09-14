@@ -1,0 +1,10 @@
+{
+  "realm": "reports-realm",
+  "auth-server-url": "http://localhost:8080",
+  "ssl-required": "external",
+  "resource": "reports-frontend",
+  "credentials": {
+    "secret": "your-secret-key"
+  },
+  "confidential-port": 0
+}
