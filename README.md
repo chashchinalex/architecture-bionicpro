@@ -17,5 +17,7 @@ Clickhouse слишком хлопотно, как и выгрузка за ко
 ## Как запустить
 1. UP docker-compose.yaml
 2. Отклываем Airflow UI http://localhost:8081/home, убеждается, что пайплайны подняты: **init_data** и **olap_pipeline**
-3. http://localhost:3000/ логинимся под **prothetic[1..3]**, нажимаем кнопку **Download Report**
-4. Выгружаются только от **prothetic[1..3]**
+3. **init_data** срабатывает единожды
+4. **olap_pipeline** срабатывает каждые 5 минут
+5. http://localhost:3000/ логинимся под **prothetic[1..3]**, нажимаем кнопку **Download Report**
+6. Выгружаются только от **prothetic[1..3]**

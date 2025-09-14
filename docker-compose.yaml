@@ -25,6 +25,8 @@ x-airflow-common: &airflow-common
   depends_on: &airflow-common-depends-on
     postgres:
       condition: service_healthy
+  networks:
+    - dag_sample
 
 services:
   # Keycloak services
@@ -57,7 +59,7 @@ services:
     volumes:
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
     ports:
-      - "8080:8080"  # Изменен порт для избежания конфликта с Airflow
+      - "8080:8080"
     depends_on:
       - keycloak_db
     networks:
@@ -139,10 +141,7 @@ services:
     networks:
       - dag_sample
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8081/health || exit 1" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      disable: true
 
   airflow-scheduler:
     <<: *airflow-common
@@ -152,14 +151,12 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      airflow-webserver:
-        condition: service_healthy
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:8081/health || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3
-    restart: always
+      start_period: 30s
 
   airflow-triggerer:
     <<: *airflow-common
@@ -201,7 +198,9 @@ services:
       postgres:
         condition: service_healthy
     command: >
-      bash -c " airflow db init && airflow users create \ --username admin \ --firstname admin \ --lastname admin \ --role Admin \ --email admin@sample.ru \ --password admin"
+      bash -c " airflow db init && airflow users create \ --username admin \ --firstname admin \ --lastname admin \ --role Admin \ --email admin@sample.ru \ --password admin 
+      
+      "
     networks:
       - dag_sample
 

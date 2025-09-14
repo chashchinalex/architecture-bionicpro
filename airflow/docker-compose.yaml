@@ -117,7 +117,7 @@ services:
     profiles:
       - debug
     command:
-      - bash
+      - bash 
       - -c
       - airflow
 

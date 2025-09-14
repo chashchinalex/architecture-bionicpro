@@ -68,7 +68,7 @@ const ReportPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-gray-100">
       <div className="p-8 bg-white rounded-lg shadow-md">
         <h1 className="text-2xl font-bold mb-6">Usage Reports</h1>
         
