@@ -3,20 +3,20 @@
 Коротко компания производит бионические протезы и собирает телеметрию для улучшения ML модели Цель проекта безопасность через PKCE и выдача отчетов из OLAP по запросу пользователя с доступом только к своим данным
 
 Технологии
-• Docker и Docker Compose
-• React TypeScript TailwindCSS
-• Keycloak PKCE S256
-• FastAPI Python 3.11
-• ClickHouse OLAP
-• Apache Airflow DAG для ETL
-• Drawio для C4
+* Docker и Docker Compose
+* React TypeScript TailwindCSS
+* Keycloak PKCE S256
+* FastAPI Python 3.11
+* ClickHouse OLAP
+* Apache Airflow DAG для ETL
+* Drawio для C4
 
 Ветки
-• main как целевая
-• insuretech для работы
+* main как целевая
+* insuretech для работы
 
 Документация
-• Диаграмма C4 в docs BionicPRO_C4_model.drawio.xml
+* Диаграмма C4 в docs BionicPRO_C4_model.drawio.xml
 
 ## Что внутри 📦
 ---
@@ -47,16 +47,15 @@
 │     └─ reports_etl_dag.py
 ├─ docs
 │  └─ BionicPRO_C4_model.drawio.xml
-├─ pintr
-│  └─ докс и библиотеки фигур для drawio
+
 └─ docker-compose.yaml
 ```
 
 ## Быстрый старт 🚀
 ---
 Подготовка Windows
-• Установи Docker Desktop
-• Установи Python 3.11 и pip
+* Установи Docker Desktop
+* Установи Python 3.11 и pip
 
 Подготовка Linux 🐧
 • Установи Docker и Docker Compose
