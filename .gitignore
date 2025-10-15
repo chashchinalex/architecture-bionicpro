@@ -1,2 +1,9 @@
+pintr/
+postgres-keycloak-data/
+frontend/node_modules/
+backend/__pycache__/
+.env
+.env.*
+
 /postgres-keycloak-data
 2024__yandex-architecture-sso.code-workspace
