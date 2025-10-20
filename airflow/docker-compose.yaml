@@ -14,6 +14,9 @@ x-airflow-common: &airflow-common
     AIRFLOW__WEBSERVER__SECRET_KEY: 'your_airflow_webserver_sec_key'
     _PIP_ADDITIONAL_REQUIREMENTS: ''
     AIRFLOW_INPUT_DIR: '/opt/airflow/dag-inputs'
+    AIRFLOW_CONN_OLAP_PG: postgresql+psycopg2://olap_user:olap_pass@postgres-olap:5432/olap_db
+    AIRFLOW_CONN_CRM_PG: postgresql+psycopg2://crm_user:crm_pass@postgres-crm:5432/crm_db
+    AIRFLOW_CONN_TELEM_PG: postgresql+psycopg2://telemetry_user:telemetry_pass@postgres-telemetry:5432/telemetry_db
   volumes:
     - ./dags:/opt/airflow/dags
     - ./dags/sql:/opt/airflow/dags/sql
@@ -62,6 +65,12 @@ services:
         condition: service_healthy
       airflow-init:
         condition: service_completed_successfully
+      postgres-crm:
+        condition: service_healthy
+      postgres-telemetry:
+        condition: service_healthy
+      postgres-olap:
+        condition: service_healthy
     command: webserver
     networks:
       - dag_sample
@@ -70,6 +79,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 90s
 
   airflow-scheduler:
     <<: *airflow-common
@@ -80,6 +90,12 @@ services:
       postgres:
         condition: service_healthy
       airflow-webserver:
+        condition: service_healthy
+      postgres-crm:
+        condition: service_healthy
+      postgres-telemetry:
+        condition: service_healthy
+      postgres-olap:
         condition: service_healthy
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:8080/health || exit 1" ]
@@ -94,6 +110,12 @@ services:
         condition: service_healthy
       airflow-init:
         condition: service_completed_successfully
+      postgres-crm:
+        condition: service_healthy
+      postgres-telemetry:
+        condition: service_healthy
+      postgres-olap:
+        condition: service_healthy
     networks:
       - dag_sample
     command: bash -c "airflow triggerer"
@@ -112,6 +134,12 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      postgres-crm:
+        condition: service_healthy
+      postgres-telemetry:
+        condition: service_healthy
+      postgres-olap:
+        condition: service_healthy
     networks:
       - dag_sample
     profiles:
@@ -126,12 +154,60 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      postgres-crm:
+        condition: service_healthy
+      postgres-telemetry:
+        condition: service_healthy
+      postgres-olap:
+        condition: service_healthy
     command: >
       bash -c " airflow db init && airflow users create \ --username admin \ --firstname admin \ --lastname admin \ --role Admin \ --email admin@sample.ru \ --password admin 
       
       "
     networks:
       - dag_sample
+
+  postgres-crm:
+    image: postgres:16.0
+    environment:
+      POSTGRES_DB: crm_db
+      POSTGRES_USER: crm_user
+      POSTGRES_PASSWORD: crm_pass
+    volumes:
+      - ./db/crm-init.sql:/docker-entrypoint-initdb.d/01-crm.sql
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "crm_user", "-d", "crm_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-telemetry:
+    image: postgres:16.0
+    environment:
+      POSTGRES_DB: telemetry_db
+      POSTGRES_USER: telem_user
+      POSTGRES_PASSWORD: telem_pass
+    volumes:
+      - ./db/telemetry-init.sql:/docker-entrypoint-initdb.d/02-telemetry.sql
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "telem_user", "-d", "telemetry_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-olap:
+    image: postgres:16.0
+    environment:
+      POSTGRES_DB: olap_db
+      POSTGRES_USER: olap_user
+      POSTGRES_PASSWORD: olap_pass
+    volumes:
+      - ./db/olap-init.sql:/docker-entrypoint-initdb.d/03-olap.sql
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "olap_user", "-d", "olap_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   dag_sample:
