@@ -1,18 +1,30 @@
-version: '3.8'
+version: '3.9'
 
 services:
   keycloak_db:
     image: postgres:14
+    networks:
+      - bionicpro-net
+    ports:
+      - "5433:5432"
     environment:
       POSTGRES_DB: keycloak_db
       POSTGRES_USER: keycloak_user
       POSTGRES_PASSWORD: keycloak_password
     volumes:
-      - ./postgres-keycloak-data:/var/lib/postgresql/data
-    ports:
-      - "5433:5432"
+      - './pg-keycloak-data:/var/lib/postgresql/data'
+
   keycloak:
     image: quay.io/keycloak/keycloak:21.1
+    depends_on:
+      - keycloak_db
+    command:
+      - start-dev
+      - --import-realm
+    networks:
+      - bionicpro-net
+    ports:
+      - "8080:8080"
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
@@ -20,23 +32,42 @@ services:
       KC_DB_URL: jdbc:postgresql://keycloak_db:5432/keycloak_db
       KC_DB_USERNAME: keycloak_user
       KC_DB_PASSWORD: keycloak_password
-    command: 
-      - start-dev
-      - --import-realm
     volumes:
-      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
-    ports:
-      - "8080:8080"
-    depends_on:
-      - keycloak_db
+      - './keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json'
+
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    networks:
+      - bionicpro-net
     ports:
       - "3000:3000"
     environment:
-      REACT_APP_API_URL: http://localhost:8000
-      REACT_APP_KEYCLOAK_URL: http://localhost:8080
+      REACT_APP_API_URL: http://backend:8000
+      REACT_APP_KEYCLOAK_URL: http://keycloak:8080
       REACT_APP_KEYCLOAK_REALM: reports-realm
       REACT_APP_KEYCLOAK_CLIENT_ID: reports-frontend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    depends_on:
+      - keycloak
+    networks:
+      - bionicpro-net
+    ports:
+      - "8000:8000"
+    environment:
+      BIONICPRO__SERVER__HTTP__ADDRESS: 0.0.0.0:8000
+      BIONICPRO__SERVER__LOGGER__LEVEL: debug
+      BIONICPRO__SERVER__LOGIN__CORS: http://localhost:3000
+      BIONICPRO__SERVER__LOGIN__KEYCLOAK__URL: http://keycloak:8080
+      BIONICPRO__SERVER__LOGIN__KEYCLOAK__REALM: reports-realm
+      BIONICPRO__SERVER__LOGIN__JWT_CACHE__EXPIRED: 15m
+
+networks:
+  bionicpro-net:
+    name: bionicpro-net
+    driver: bridge
