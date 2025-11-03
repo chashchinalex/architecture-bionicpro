@@ -1,0 +1,15 @@
+[server.http]
+address = "0.0.0.0:8000"
+
+[server.logger]
+level = "info"
+
+[server.login]
+cors = ["*"]
+
+[server.login.keycloak]
+url = "http://keycloak:8080"
+realm = "reports-realm"
+
+[server.login.jwt_cache]
+expired = "15m"
