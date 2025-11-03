@@ -1,12 +1,9 @@
 package httpserver
 
 import (
-	"math/rand"
+	"github.com/labstack/echo/v4"
 	"net/http"
 	"strings"
-	"time"
-
-	"github.com/labstack/echo/v4"
 )
 
 func (s *Server) CreateStorageBucketsGroup() error {
@@ -57,22 +54,29 @@ func (s *Server) ReportsHandler(eCtx echo.Context) error {
 		user, _ = claims["sub"].(string)
 	}
 
-	sample := echo.Map{
-		"generated_at": time.Now().Unix(),
-		"user":         user,
-		"summary": echo.Map{
-			"sessions":          rand.Int(),
-			"active_days":       rand.Int(),
-			"avg_usage_minutes": rand.Int(),
-		},
-		"entries": []echo.Map{
-			{"day": "Mon", "minutes": 45},
-			{"day": "Tue", "minutes": 12},
-			{"day": "Wed", "minutes": 56},
-			{"day": "Thu", "minutes": 21},
-			{"day": "Fri", "minutes": 31},
-		},
+	ctx := eCtx.Request().Context()
+	reportData, err := s.reporter.GenReport(ctx, user)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return eCtx.JSON(http.StatusCreated, sample)
+	// TODO: comment this code block after clickhouse implementation
+	//sample := echo.Map{
+	//	"generated_at": time.Now().Unix(),
+	//	"user":         user,
+	//	"summary": echo.Map{
+	//		"sessions":          rand.Int(),
+	//		"active_days":       rand.Int(),
+	//		"avg_usage_minutes": rand.Int(),
+	//	},
+	//	"entries": []echo.Map{
+	//		{"day": "Mon", "minutes": 45},
+	//		{"day": "Tue", "minutes": 12},
+	//		{"day": "Wed", "minutes": 56},
+	//		{"day": "Thu", "minutes": 21},
+	//		{"day": "Fri", "minutes": 31},
+	//	},
+	//}
+
+	return eCtx.JSON(http.StatusCreated, reportData)
 }

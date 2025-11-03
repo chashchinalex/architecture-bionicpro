@@ -10,7 +10,8 @@ import (
 )
 
 type Config struct {
-	Server ServerConfig `mapstructure:"server"`
+	Server   ServerConfig   `mapstructure:"server"`
+	Reporter ReporterConfig `mapstructure:"reporter"`
 }
 
 type ServerConfig struct {
@@ -40,6 +41,13 @@ type JwtCacheConfig struct {
 type KeycloakConfig struct {
 	URL   string `mapstructure:"url"`
 	Realm string `mapstructure:"realm"`
+}
+
+type ReporterConfig struct {
+	Address  string `mapstructure:"address"`
+	Database string `mapstructure:"database"`
+	Username string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
 }
 
 func FromFile(filePath string) (*Config, error) {

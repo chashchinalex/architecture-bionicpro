@@ -1,6 +1,7 @@
 package httpserver
 
 import (
+	"bionicpro/internal/reporter"
 	"context"
 	"fmt"
 	"log"
@@ -25,21 +26,20 @@ import (
 // @tag.name api
 // @tag.description APIs to get status tasks. When TaskStatus may be:
 type Server struct {
-	config *config.ServerConfig
-	server *echo.Echo
-	jwks   keyfunc.Keyfunc
-	//jwks   *mw.JWKSClient
+	config   *config.ServerConfig
+	server   *echo.Echo
+	reporter *reporter.Reporter
+	jwks     keyfunc.Keyfunc
 }
 
-func New(config *config.ServerConfig) *Server {
+func New(config *config.ServerConfig, reporter *reporter.Reporter) *Server {
 	return &Server{
-		config: config,
+		config:   config,
+		reporter: reporter,
 	}
 }
 
 func (s *Server) setupServer() {
-	//s.jwks = mw.NewJWKCache(s.config)
-
 	s.server = echo.New()
 
 	s.server.Use(middleware.Recover())
