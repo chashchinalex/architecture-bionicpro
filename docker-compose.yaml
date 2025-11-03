@@ -55,6 +55,7 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - keycloak
+      - report-db
     networks:
       - bionicpro-net
     ports:
@@ -65,7 +66,37 @@ services:
       BIONICPRO__SERVER__LOGIN__CORS: http://localhost:3000
       BIONICPRO__SERVER__LOGIN__KEYCLOAK__URL: http://keycloak:8080
       BIONICPRO__SERVER__LOGIN__KEYCLOAK__REALM: reports-realm
-      BIONICPRO__SERVER__LOGIN__JWT_CACHE__EXPIRED: 15m
+      BIONICPRO__REPORTER__ADDRESS: report-db:9000
+
+  crm-db:
+    image: postgres:14
+    networks:
+      - bionicpro-net
+    ports:
+      - "3432:5432"
+    environment:
+      POSTGRES_DB: crm_db
+      POSTGRES_USER: crm_user
+      POSTGRES_PASSWORD: crm_password
+    volumes:
+      - './crm-db-data:/var/lib/postgresql/data'
+      - './crm/postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql'
+
+  report-db:
+    image: clickhouse/clickhouse-server:25.3-alpine
+    networks:
+      - bionicpro-net
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - './clickhouse-data/data:/var/lib/clickhouse'
+      - './clickhouse-data/logs:/var/log/clickhouse-server'
+      - './clickhouse/ch-init.sql:/docker-entrypoint-initdb.d/ch-init.sql'
+    environment:
+      CLICKHOUSE_DB: analytic
+      CLICKHOUSE_USER: analytic_user
+      CLICKHOUSE_PASSWORD: analytic_password
 
 networks:
   bionicpro-net:
