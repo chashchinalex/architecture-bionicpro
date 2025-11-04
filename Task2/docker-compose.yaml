@@ -160,7 +160,22 @@ services:
       - bash
       - -c
       - airflow
-
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      KEYCLOAK_REALM: reports-realm
+      KEYCLOAK_ISSUER: http://keycloak:8080/realms/reports-realm
+      KEYCLOAK_CLIENT_ID: reports-api
+      KEYCLOAK_CLIENT_SECRET: oNwoLQdvJAvRcL89SydqCWCe5ry1jMgq
+    depends_on:
+      - postgres
+      - keycloak
+    networks:
+      - dag_sample
   airflow-init:
     <<: *airflow-common
     depends_on:
