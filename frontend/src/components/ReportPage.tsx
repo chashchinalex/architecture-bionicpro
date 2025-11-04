@@ -22,6 +22,13 @@ const ReportPage: React.FC = () => {
         }
       });
 
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({detail: 'Error'}));
+        throw new Error(error.detail);
+      }
+
+      const data = await response.json();
+      console.log('Report:', data);
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
