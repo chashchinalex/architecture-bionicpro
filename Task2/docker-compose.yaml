@@ -37,6 +37,8 @@ services:
       - ./postgres-keycloak-data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
+    networks:
+      - dag_sample
   keycloak:
     image: quay.io/keycloak/keycloak:21.1
     environment:
@@ -55,6 +57,8 @@ services:
       - "8080:8080"
     depends_on:
       - keycloak_db
+    networks:
+      - dag_sample
   frontend:
     build:
       context: ./frontend
@@ -168,9 +172,13 @@ services:
       - "8000:8000"
     environment:
       KEYCLOAK_REALM: reports-realm
-      KEYCLOAK_ISSUER: http://keycloak:8080/realms/reports-realm
-      KEYCLOAK_CLIENT_ID: reports-api
-      KEYCLOAK_CLIENT_SECRET: oNwoLQdvJAvRcL89SydqCWCe5ry1jMgq
+      KEYCLOAK_ISSUER: http://localhost:8080/realms/reports-realm
+      KEYCLOAK_CLIENT_ID: reports-frontend
+      KEYCLOAK_PUBLIC_KEY: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA619zHXa97iBpmuFq5HHaxJrqztU0DsEknzpq7Dizk8ZYgmzM1xAUHGeuDiwVuP+wFqfEp5SS4eXJf/1EfkZSzcFBbRQZKjtqz+9LsoCe8zQ6mWYKsceJ0duAjOXJQcXIkhvE/qLq1A5nV0168VQtQr6NFvMTwi2YmVXhBc1gxQpZ6h7yJEVPFqypepY7cIzUfh7iapTwdGSOwSquDBE3xTqVi23SXaZrTqRwPckDQ+6e3Bxn8PT2G4gazSq05b4TPNXf9mQKZWrCfUoeTB2EivtFkFT/MCaOAIDXwCfunknQXo6Z5VGvJSBmdX7/nqdjXQzBBoGUscyxcDUZdrZIdwIDAQAB
+      DB_HOST: postgres
+      DB_NAME: airflow
+      DB_USER: airflow
+      DB_PASS: airflow
     depends_on:
       - postgres
       - keycloak
