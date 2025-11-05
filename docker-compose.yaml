@@ -2,11 +2,9 @@ version: '3.9'
 
 services:
   keycloak_db:
-    image: postgres:14
+    image: postgres:16-alpine
     networks:
       - bionicpro-net
-    ports:
-      - "5433:5432"
     environment:
       POSTGRES_DB: keycloak_db
       POSTGRES_USER: keycloak_user
@@ -28,9 +26,6 @@ services:
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_HOSTNAME_STRICT_HTTPS: false
-      KC_HTTP_ENABLED: true
-      KC_HTTPS_REQUIRED: none
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://keycloak_db:5432/keycloak_db
       KC_DB_USERNAME: keycloak_user
@@ -66,13 +61,12 @@ services:
     environment:
       BIONICPRO__SERVER__HTTP__ADDRESS: 0.0.0.0:8000
       BIONICPRO__SERVER__LOGGER__LEVEL: debug
-      BIONICPRO__SERVER__LOGIN__CORS: http://localhost:3000
       BIONICPRO__SERVER__LOGIN__KEYCLOAK__URL: http://keycloak:8080
       BIONICPRO__SERVER__LOGIN__KEYCLOAK__REALM: reports-realm
       BIONICPRO__REPORTER__ADDRESS: report-db:9000
 
   crm-db:
-    image: postgres:14
+    image: postgres:16-alpine
     networks:
       - bionicpro-net
     ports:
