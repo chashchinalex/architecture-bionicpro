@@ -12,7 +12,7 @@ services:
       POSTGRES_USER: keycloak_user
       POSTGRES_PASSWORD: keycloak_password
     volumes:
-      - './pg-keycloak-data:/var/lib/postgresql/data'
+      - 'keycloak-db-data:/var/lib/postgresql/data'
 
   keycloak:
     image: quay.io/keycloak/keycloak:21.1
@@ -28,6 +28,9 @@ services:
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HTTP_ENABLED: true
+      KC_HTTPS_REQUIRED: none
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://keycloak_db:5432/keycloak_db
       KC_DB_USERNAME: keycloak_user
@@ -79,7 +82,7 @@ services:
       POSTGRES_USER: crm_user
       POSTGRES_PASSWORD: crm_password
     volumes:
-      - './crm-db-data:/var/lib/postgresql/data'
+      - 'crm-db-data-vol:/var/lib/postgresql/data'
       - './crm/postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql'
 
   report-db:
@@ -90,8 +93,8 @@ services:
       - "8123:8123"
       - "9000:9000"
     volumes:
-      - './clickhouse-data/data:/var/lib/clickhouse'
-      - './clickhouse-data/logs:/var/log/clickhouse-server'
+      - 'report-db-data-vol:/var/lib/clickhouse'
+      - 'report-db-logs-vol:/var/log/clickhouse-server'
       - './clickhouse/ch-init.sql:/docker-entrypoint-initdb.d/ch-init.sql'
     environment:
       CLICKHOUSE_DB: analytic
@@ -102,3 +105,9 @@ networks:
   bionicpro-net:
     name: bionicpro-net
     driver: bridge
+
+volumes:
+  crm-db-data-vol:
+  keycloak-db-data:
+  report-db-data-vol:
+  report-db-logs-vol:

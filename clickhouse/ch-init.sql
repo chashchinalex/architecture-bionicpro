@@ -1,37 +1,54 @@
 USE analytic;
 
-CREATE TABLE reports
-(
-    prosthesis_id UInt64,
+DROP TABLE IF EXISTS reports;
+CREATE TABLE IF NOT EXISTS reports (
+    id UInt64,
     username String,
-    email String,
-    sensor_type String,
+    age UInt16,
+    prosthesis_id UInt64,
     sensor_name String,
-    force_newtons_avg Decimal,
-    battery_level_percent_avg Decimal,
-    created_at DateTime DEFAULT now()
+    sensor_type String,
+    installed_at DateTime,
+    metric_timestamp DateTime,
+    force_newtons UInt32,
+    force_direction Decimal,
+    acceleration_x UInt32,
+    acceleration_y UInt32,
+    acceleration_z UInt32,
+    temperature_celsius UInt32,
+    battery_level_percent UInt32
 )
 ENGINE = MergeTree()
-ORDER BY prosthesis_id
-PRIMARY KEY prosthesis_id;
+ORDER BY id
+PRIMARY KEY id;
 
-INSERT INTO reports(prosthesis_id, username, email, sensor_type, sensor_name, force_newtons_avg, battery_level_percent_avg)
-VALUES (1, 'prothetic1', 'prothetic1@example.com', 'sensor', 'sensor_1', 1, 1);
 
-INSERT INTO reports(prosthesis_id, username, email, sensor_type, sensor_name, force_newtons_avg, battery_level_percent_avg)
-VALUES (2, 'prothetic1', 'prothetic1@example.com', 'sensor', 'sensor_2', 2, 2);
+INSERT INTO reports (username, age, prosthesis_id, sensor_name, sensor_type, installed_at,
+                     metric_timestamp, force_newtons, force_direction,
+                     acceleration_x, acceleration_y, acceleration_z,
+                     temperature_celsius, battery_level_percent)
+VALUES (
+   'prothetic1', 24, 1, 'Sensor A', 'below_elbow',
+   '2025-10-01 15:30:00', '2025-10-01 15:30:00',2554, 109.0,
+   87, 95, 78, 90, 80
+);
 
-INSERT INTO reports(prosthesis_id, username, email, sensor_type, sensor_name, force_newtons_avg, battery_level_percent_avg)
-VALUES (3, 'prothetic1', 'prothetic1@example.com', 'sensor', 'sensor_3', 3, 3);
+INSERT INTO reports (username, age, prosthesis_id, sensor_name, sensor_type, installed_at,
+                     metric_timestamp, force_newtons, force_direction,
+                     acceleration_x, acceleration_y, acceleration_z,
+                     temperature_celsius, battery_level_percent)
+VALUES (
+   'prothetic1', 24, 2, 'Sensor B', 'below_elbow',
+   '2025-10-02 15:30:00', '2025-10-02 15:30:00',2554, 109.0,
+   87, 95, 78, 90, 90
+);
 
-INSERT INTO reports(prosthesis_id, username, email, sensor_type, sensor_name, force_newtons_avg, battery_level_percent_avg)
-VALUES (4, 'prothetic1', 'prothetic1@example.com', 'sensor', 'sensor_4', 4, 4);
-
-INSERT INTO reports(prosthesis_id, username, email, sensor_type, sensor_name, force_newtons_avg, battery_level_percent_avg)
-VALUES (5, 'prothetic2', 'prothetic2@example.com', 'sensor', 'sensor_1', 1, 1);
-
-INSERT INTO reports(prosthesis_id, username, email, sensor_type, sensor_name, force_newtons_avg, battery_level_percent_avg)
-VALUES (6, 'prothetic2', 'prothetic2@example.com', 'sensor', 'sensor_2', 2, 2);
-
-INSERT INTO reports(prosthesis_id, username, email, sensor_type, sensor_name, force_newtons_avg, battery_level_percent_avg)
-VALUES (7, 'prothetic3', 'prothetic3@example.com', 'sensor', 'sensor_1', 1, 1);
+INSERT INTO reports (username, age, prosthesis_id, sensor_name, sensor_type, installed_at,
+                     metric_timestamp, force_newtons, force_direction,
+                     acceleration_x, acceleration_y, acceleration_z,
+                     temperature_celsius, battery_level_percent)
+VALUES (
+   'prothetic2', 35, 4, 'Sensor C', 'below_elbow',
+   '2025-10-02 15:30:00', '2025-10-02 15:30:00',2554, 109.0,
+   87, 95, 78, 90, 90
+);

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"bionicpro/internal/config"
+
 	"github.com/jmoiron/sqlx"
 
 	_ "github.com/ClickHouse/clickhouse-go/v2"
@@ -17,14 +18,20 @@ type Reporter struct {
 }
 
 type UserReport struct {
-	ProsthesisID           int64     `db:"prosthesis_id" json:"prosthesis_id"`
-	Username               string    `db:"username" json:"username"`
-	Email                  string    `db:"email" json:"email"`
-	SensorType             string    `db:"sensor_type" json:"sensor_type"`
-	SensorName             string    `db:"sensor_name" json:"sensor_name"`
-	ForceNewtonsAVG        int       `db:"force_newtons_avg" json:"force_newtons_avg"`
-	BatteryLevelPercentAVG int       `db:"battery_level_percent_avg" json:"battery_level_percent_avg"`
-	CreatedAt              time.Time `db:"created_at" json:"created_at"`
+	Username            string    `db:"username" json:"username"`
+	Age                 int       `db:"age" json:"age"`
+	ProsthesisID        int64     `db:"prosthesis_id" json:"prosthesis_id"`
+	SensorName          string    `db:"sensor_name" json:"sensor_name"`
+	SensorType          string    `db:"sensor_type" json:"sensor_type"`
+	InstalledAt         time.Time `db:"installed_at" json:"installed_at"`
+	MetricTimestamp     time.Time `db:"metric_timestamp" json:"metric_timestamp"`
+	ForceNewtons        int       `db:"force_newtons" json:"force_newtons"`
+	ForceDirection      float32   `db:"force_direction" json:"force_direction"`
+	AccelerationX       int       `db:"acceleration_x" json:"acceleration_x"`
+	AccelerationY       int       `db:"acceleration_y" json:"acceleration_y"`
+	AccelerationZ       int       `db:"acceleration_z" json:"acceleration_z"`
+	TemperatureCelsius  int       `db:"temperature_celsius" json:"temperature_celsius"`
+	BatteryLevelPercent int       `db:"battery_level_percent" json:"battery_level_percent"`
 }
 
 func NewReporter(config config.ReporterConfig) *Reporter {
@@ -54,13 +61,20 @@ func (r *Reporter) Close() {
 
 func (r *Reporter) GenReport(ctx context.Context, user string) ([]UserReport, error) {
 	query := `
-		SELECT  prosthesis_id,
-				email,
+		SELECT  username, 
+		        age, 
+		        prosthesis_id,
+		        sensor_name,
 				sensor_type,
-    			sensor_name,
-    			force_newtons_avg,
-				battery_level_percent_avg,
-				created_at
+    			installed_at,
+    			metric_timestamp,
+    			force_newtons,
+    			force_direction,
+    			acceleration_x,
+    			acceleration_y,
+    			acceleration_z,
+    			temperature_celsius,
+				battery_level_percent
 		FROM reports
 		WHERE username = ?
 	`
