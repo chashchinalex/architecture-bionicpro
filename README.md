@@ -133,13 +133,31 @@ BionicPRO собирает и хранит информацию о сигнал�
 Его нужно добавить к уже существующим приложениям — фронтенду и Keycloak. Мы неслучайно не рассказывали в теории, как 
 это сделать. Чтобы разобраться, изучите официальную документацию.
 
+![frontend-report-result.png](docs/frontend-report-result.png)
 
 #### Результат выполнения задач
 
 Схема системы:
 [bionicpro-c4-model.auth.drawio](docs/bionicpro-c4-model.auth.drawio)
+![bionicpro-c4-model.auth.png](docs/bionicpro-c4-model.auth.png)
 
-Был также реализован backend для возвращения report данных пользователя. 
+Был также реализован backend для возвращения report данных пользователя.
+![frontend-report-result.png](docs/frontend-report-result.png)
+
+**Для запуска keycloak без SSL**
+Возможно потребуется сделать следующие шаги после поднятия контейнера: 
+```shell
+cd /opt/keycloak/bin
+
+/kcadm.sh config credentials --server http://localhost:8080/ --realm master --user admin
+<enter admin password>
+
+# Для доступа к админ панели
+./kcadm.sh update realms/master -s sslRequired=NONE
+
+# Для доступа из frontend'а
+./kcadm.sh update realms/reports-realm -s sslRequired=NONE
+```
 
 
 ## Task 2
@@ -177,3 +195,11 @@ API, который обозначен на исходной архитекту�
 
 #### Задача 5. Добавьте в UI кнопку получения отчёта и вызова эндпоинта его генерации.
 
+#### Результат выполнения задач
+
+Схема системы:
+[bionicpro-c4-model.airflow.drawio](docs/bionicpro-c4-model.airflow.drawio)
+![bionicpro-c4-model.airflow.png](docs/bionicpro-c4-model.airflow.png)
+
+Генерация отчета в airflow:
+![airflow-report-result.png](docs/airflow-report-result.png)
