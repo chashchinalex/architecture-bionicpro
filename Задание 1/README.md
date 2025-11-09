@@ -36,3 +36,11 @@
 
 Настроенный OTP:
 ![alt text](image-2.png)
+
+## Добавьте OAuth 2.0 от Яндекс ID.
+
+Создано приложение в Яндекс ID:
+![alt text](image-4.png)
+
+настроен OIDC-провайдер:
+![alt text](image-3.png)

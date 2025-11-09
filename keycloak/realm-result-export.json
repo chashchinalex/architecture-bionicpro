@@ -627,7 +627,41 @@
     "enabledEventTypes": [],
     "adminEventsEnabled": false,
     "adminEventsDetailsEnabled": false,
-    "identityProviders": [],
+    "identityProviders": [
+        {
+            "alias": "oidc",
+            "displayName": "",
+            "internalId": "8ed5fda1-d72e-4a68-9995-55519a6825ce",
+            "providerId": "oidc",
+            "enabled": true,
+            "updateProfileFirstLoginMode": "on",
+            "trustEmail": false,
+            "storeToken": false,
+            "addReadTokenRoleOnCreate": false,
+            "authenticateByDefault": false,
+            "linkOnly": false,
+            "firstBrokerLoginFlowAlias": "first broker login",
+            "config": {
+                "validateSignature": "false",
+                "hideOnLoginPage": "false",
+                "tokenUrl": "https://oauth.yandex.ru/token",
+                "acceptsPromptNoneForwardFromClient": "false",
+                "clientId": "0181f9c64d6a4315a9573ddb393ed6d4",
+                "uiLocales": "false",
+                "backchannelSupported": "false",
+                "loginHint": "false",
+                "pkceEnabled": "false",
+                "clientAuthMethod": "client_secret_post",
+                "authorizationUrl": "https://oauth.yandex.ru/authorize",
+                "disableUserInfo": "true",
+                "syncMode": "IMPORT",
+                "clientSecret": "**********",
+                "passMaxAge": "false",
+                "allowedClockSkew": "0",
+                "defaultScope": "login:info"
+            }
+        }
+    ],
     "identityProviderMappers": [],
     "components": {
         "org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy": [
