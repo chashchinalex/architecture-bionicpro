@@ -1,0 +1,73 @@
+dn: ou=employees,dc=bionicpro,dc=com
+objectClass: organizationalUnit
+ou: employees
+
+dn: ou=groups,dc=bionicpro,dc=com
+objectClass: organizationalUnit
+ou: groups
+
+dn: uid=user1,ou=employees,dc=bionicpro,dc=com
+objectClass: inetOrgPerson
+cn: User One
+sn: One
+uid: user1
+mail: user1@example.com
+userPassword: password123
+
+dn: uid=user2,ou=employees,dc=bionicpro,dc=com
+objectClass: inetOrgPerson
+cn: User Two
+sn: Two
+uid: user2
+mail: user2@example.com
+userPassword: password123
+
+dn: uid=admin1,ou=employees,dc=bionicpro,dc=com
+objectClass: inetOrgPerson
+cn: Admin One
+sn: One
+uid: admin1
+mail: admin1@example.com
+userPassword: admin123
+
+dn: uid=prothetic1,ou=employees,dc=bionicpro,dc=com
+objectClass: inetOrgPerson
+cn: Prothetic One
+sn: One
+uid: prothetic1
+mail: prothetic1@example.com
+userPassword: prothetic123
+
+dn: uid=prothetic2,ou=employees,dc=bionicpro,dc=com
+objectClass: inetOrgPerson
+cn: Prothetic Two
+sn: Two
+uid: prothetic2
+mail: prothetic2@example.com
+userPassword: prothetic123
+
+dn: uid=prothetic3,ou=employees,dc=bionicpro,dc=com
+objectClass: inetOrgPerson
+cn: Prothetic Tree
+sn: Tree
+uid: prothetic3
+mail: prothetic3@example.com
+userPassword: prothetic123
+
+dn: cn=user,ou=groups,dc=bionicpro,dc=com
+objectClass: groupOfNames
+cn: user
+member: uid=user1,ou=employees,dc=bionicpro,dc=com
+member: uid=user2,ou=employees,dc=bionicpro,dc=com
+
+dn: cn=administrator,ou=groups,dc=bionicpro,dc=com
+objectClass: groupOfNames
+cn: administrator
+member: uid=admin1,ou=employees,dc=bionicpro,dc=com
+
+dn: cn=prothetic_user,ou=groups,dc=bionicpro,dc=com
+objectClass: groupOfNames
+cn: prothetic_user
+member: uid=prothetic1,ou=employees,dc=bionicpro,dc=com
+member: uid=prothetic2,ou=employees,dc=bionicpro,dc=com
+member: uid=prothetic3,ou=employees,dc=bionicpro,dc=com
