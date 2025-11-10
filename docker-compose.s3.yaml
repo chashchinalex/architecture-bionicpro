@@ -1,0 +1,40 @@
+services:
+  s3:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    networks:
+      - s3-private
+      - s3-public
+    volumes:
+      - s3-data:/data:rw
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+
+  s3-loader:
+    image: minio/mc
+    depends_on:
+      - s3
+    networks:
+      - s3-private
+    entrypoint: ["/opt/s3-loader/entrypoint.sh"]
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - ./s3-loader/entrypoint.sh:/opt/s3-loader/entrypoint.sh:ro
+      - ./s3-loader/resources/:/opt/s3-loader/resources/:ro
+      - ./s3-loader/init-bucket.sh:/opt/s3-loader/init-bucket.sh:ro
+      - ./s3-loader/init-user.sh:/opt/s3-loader/init-user.sh:ro
+
+networks:
+  s3-private:
+    driver: bridge
+  s3-public:
+    driver: bridge
+
+volumes:
+  s3-data:
