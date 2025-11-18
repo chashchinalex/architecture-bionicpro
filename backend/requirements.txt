@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+requests
+PyJWT
+cryptography
+pydantic
+psycopg2-binary
+minio

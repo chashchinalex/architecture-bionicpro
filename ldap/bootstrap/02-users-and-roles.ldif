@@ -1,0 +1,31 @@
+# Пользователь российского представительства
+dn: uid=ivan.petrov,ou=users,dc=bionicpro,dc=local
+objectClass: inetOrgPerson
+sn: Petrov
+givenName: Ivan
+cn: Ivan Petrov
+uid: ivan.petrov
+mail: ivan.petrov@bionicpro.local
+userPassword: {CLEARTEXT}secret123
+
+# Пользователь немецкого представительства
+dn: uid=peter.schmidt,ou=users,dc=bionicpro,dc=local
+objectClass: inetOrgPerson
+sn: Schmidt
+givenName: Peter
+cn: Peter Schmidt
+uid: peter.schmidt
+mail: peter.schmidt@bionicpro.local
+userPassword: {CLEARTEXT}secret123
+
+# Группа (роль) российского представительства
+dn: cn=bionicpro-ru,ou=groups,dc=bionicpro,dc=local
+objectClass: groupOfNames
+cn: bionicpro-ru
+member: uid=ivan.petrov,ou=users,dc=bionicpro,dc=local
+
+# Группа (роль) немецкого представительства
+dn: cn=bionicpro-de,ou=groups,dc=bionicpro,dc=local
+objectClass: groupOfNames
+cn: bionicpro-de
+member: uid=peter.schmidt,ou=users,dc=bionicpro,dc=local
