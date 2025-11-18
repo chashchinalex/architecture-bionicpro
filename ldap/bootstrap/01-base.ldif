@@ -1,0 +1,16 @@
+dn: dc=bionicpro,dc=local
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: BionicPRO
+dc: bionicpro
+
+dn: ou=users,dc=bionicpro,dc=local
+objectClass: top
+objectClass: organizationalUnit
+ou: users
+
+dn: ou=groups,dc=bionicpro,dc=local
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
